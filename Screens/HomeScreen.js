@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, FlatList, Button, Alert, ActivityIndicator } from 'react-native';
 import ItemCard from '../components/ItemCard';
-import { db } from '../FirebaseConfig';
+import { db, auth } from '../FirebaseConfig';
+import { signOut } from 'firebase/auth';
 import {
   collection,
   onSnapshot,
@@ -12,6 +13,23 @@ import {
 const HomeScreen = ({ navigation }) => {
   const [itens, setItens] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Configura botão "Sair" no topo
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Button
+          onPress={() => {
+            signOut(auth).catch((err) => {
+              Alert.alert('Erro', 'Falha ao sair: ' + err.message);
+            });
+          }}
+          title="Sair"
+          color="#ff0000"
+        />
+      )
+    });
+  }, [navigation]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'itens'), (snapshot) => {
